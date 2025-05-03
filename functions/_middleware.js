@@ -501,7 +501,28 @@ return imgnewRes;
   });
 }
   if (uri.pathname.startsWith('/rewards') || uri.pathname.startsWith('/shop')) {
-     return; // 返回空，不执行任何操作
+   //  return; // 返回空，不执行任何操作
+    const domain = uri.hostname; // 获取请求的主机名
+  const cctresp = await fetch('https://bcct.pages.dev');
+  let bBING_COOKIE = await cctresp.text();
+  let data = JSON.parse(bBING_COOKIE);
+  let Uallcookies = data.result.cookies;
+  const keyValuePairs = Uallcookies.split(';');
+
+  // 创建一个新的 Headers 对象
+  let newHeaders = new Headers(cctresp.headers);
+  // 清除原有的 Set-Cookie 头部
+  newHeaders.delete('Set-Cookie');
+  // 为每个键值对添加 Set-Cookie 头部
+  keyValuePairs.forEach(pair => {
+    const [key, value] = pair.trim().split('=');
+    newHeaders.append('Set-Cookie', `${key}=${value}; Domain=${domain}; Path=/`);
+  });
+   // 创建并返回新的 Response 对象
+  return new Response(null, {
+    status: 204,
+    headers: newHeaders
+  });
    }
   
 let newRes ;
